@@ -1,6 +1,7 @@
 package com.stackly.employee_management.service;
 
 import com.stackly.employee_management.entity.Employee;
+import com.stackly.employee_management.exception.ResourceNotFoundException;
 import com.stackly.employee_management.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class EmployeeService {
 
     // GET BY ID
     public Employee getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
+        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
     }
 
     // CREATE
