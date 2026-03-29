@@ -42,7 +42,9 @@ public class AuthService implements UserDetailsService {
     public User register(User user) {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.EMPLOYEE); // default role
+        if (user.getRole() == null) {
+            user.setRole(Role.EMPLOYEE);
+        }
 
         return userRepository.save(user);
     }
