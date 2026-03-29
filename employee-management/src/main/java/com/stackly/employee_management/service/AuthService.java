@@ -5,6 +5,8 @@ import com.stackly.employee_management.entity.User;
 import com.stackly.employee_management.repository.UserRepository;
 import com.stackly.employee_management.security.JwtUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService implements UserDetailsService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+
     @Autowired
     private UserRepository userRepository;
 
@@ -28,12 +32,20 @@ public class AuthService implements UserDetailsService {
 
     // LOGIN
     public String login(String username, String password) {
+        logger.info("Login attempt for user: {}", username);
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    logger.error("User not found: {}", username);
+                    return new RuntimeException("User not found");
+                });
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            logger.error("Invalid password for user: {}", username);
+            throw new RuntimeException("Invalid credentials");
         }
+
+        logger.info("Login successful for user: {}", username);
 
         return jwtUtil.generateToken(username);
     }

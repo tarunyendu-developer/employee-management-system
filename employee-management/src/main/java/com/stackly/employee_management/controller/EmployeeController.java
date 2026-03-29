@@ -2,6 +2,8 @@ package com.stackly.employee_management.controller;
 
 import com.stackly.employee_management.entity.Employee;
 import com.stackly.employee_management.service.EmployeeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,8 @@ import java.util.List;
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+
     @Autowired
     private EmployeeService service;
 
@@ -19,6 +23,7 @@ public class EmployeeController {
     @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     @GetMapping
     public List<Employee> getAllEmployees() {
+        logger.info("API call: GET /api/employees");
         return service.getAll();
     }
 
