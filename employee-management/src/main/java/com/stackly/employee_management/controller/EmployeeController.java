@@ -30,6 +30,7 @@ public class EmployeeController {
     // GET BY ID
     @GetMapping("/{id}")
     public Employee getEmployee(@PathVariable Long id) {
+        logger.info("API call: GET /api/employees/id");
         return service.getById(id);
     }
 
@@ -43,8 +44,7 @@ public class EmployeeController {
     // UPDATE
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public Employee updateEmployee(@PathVariable Long id,
-                                   @RequestBody Employee employee) {
+    public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
         return service.update(id, employee);
     }
 

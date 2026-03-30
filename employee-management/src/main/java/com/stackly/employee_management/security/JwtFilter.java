@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,54 +27,33 @@ public class JwtFilter extends OncePerRequestFilter {
     private UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+        String header = request.getHeader("Authorization");
 
-        String username = null;
-        String token = null;
+        if (header != null && header.startsWith("Bearer ")) {
 
-        // STEP 1: Extract token
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            username = jwtUtil.extractUsername(token);
-        }
+            String token = header.substring(7);
+            String username = jwtUtil.extractUsername(token);
 
-        // STEP 2: Validate and set authentication
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            //  STEP 3: Get user from DB
             User user = userRepository.findByUsername(username).orElse(null);
 
-            if (user != null && jwtUtil.validateToken(token, username)) {
-
-                // STEP 4: Set role
-                List<SimpleGrantedAuthority> authorities = List.of(
-                        new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
-                );
-
-                UsernamePasswordAuthenticationToken authToken =
+            if (user != null) {
+                UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
                                 username,
                                 null,
-                                authorities
+                                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
                         );
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
 
-        filterChain.doFilter(request, response);
+        chain.doFilter(request, response);
     }
 
-    // IMPORTANT: Skip auth endpoints
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         return request.getServletPath().startsWith("/auth");

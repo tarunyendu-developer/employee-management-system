@@ -22,10 +22,28 @@ public class AnalyticsService {
     public Map<String, Double> getSalaryStats() {
         List<Employee> employees = repository.findAll();
 
-        double total = employees.stream().mapToDouble(Employee::getSalary).sum();
-        double avg = employees.stream().mapToDouble(Employee::getSalary).average().orElse(0);
-        double max = employees.stream().mapToDouble(Employee::getSalary).max().orElse(0);
-        double min = employees.stream().mapToDouble(Employee::getSalary).min().orElse(0);
+        double total = employees.stream()
+                .filter(e -> e.getSalary() != null)
+                .mapToDouble(Employee::getSalary)
+                .sum();
+
+        double avg = employees.stream()
+                .filter(e -> e.getSalary() != null)
+                .mapToDouble(Employee::getSalary)
+                .average()
+                .orElse(0);
+
+        double max = employees.stream()
+                .filter(e -> e.getSalary() != null)
+                .mapToDouble(Employee::getSalary)
+                .max()
+                .orElse(0);
+
+        double min = employees.stream()
+                .filter(e -> e.getSalary() != null)
+                .mapToDouble(Employee::getSalary)
+                .min()
+                .orElse(0);
 
         Map<String, Double> stats = new HashMap<>();
         stats.put("total", total);

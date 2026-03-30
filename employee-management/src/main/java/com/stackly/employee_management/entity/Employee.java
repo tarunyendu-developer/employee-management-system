@@ -1,7 +1,12 @@
 package com.stackly.employee_management.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "employees")
 public class Employee {
@@ -15,50 +20,4 @@ public class Employee {
     private String department;
     private Double salary;
 
-    // Constructors
-    public Employee() {}
-
-    public Employee(String name, String email, String department, Double salary) {
-        this.name = name;
-        this.email = email;
-        this.department = department;
-        this.salary = salary;
-    }
-
-    // Getters & Setters
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
-    }
-
-    public Double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Double salary) {
-        this.salary = salary;
-    }
 }
